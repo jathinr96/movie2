@@ -9,28 +9,27 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.demotxt.myapp.myapplication.activities.AnimeActivity;
-import com.demotxt.myapp.myapplication.model.Anime;
+import com.demotxt.myapp.myapplication.activities.MovieActivity;
+import com.demotxt.myapp.myapplication.model.Movie;
 import com.demotxt.myapp.myapplication.R ;
 
 import java.util.List;
 
 /**
- * Created by Aws on 11/03/2018.
+ * Created by Aws on 02/02/2019.
  */
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
 
     private Context mContext ;
-    private List<Anime> mData ;
+    private List<Movie> mData ;
     RequestOptions option;
 
 
-    public RecyclerViewAdapter(Context mContext, List<Anime> mData) {
+    public RecyclerViewAdapter(Context mContext, List<Movie> mData) {
         this.mContext = mContext;
         this.mData = mData;
 
@@ -50,7 +49,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public void onClick(View v) {
 
-                Intent i = new Intent(mContext, AnimeActivity.class);
+                Intent i = new Intent(mContext, MovieActivity.class);
                 i.putExtra("anime_name",mData.get(viewHolder.getAdapterPosition()).getName());
                 i.putExtra("anime_description",mData.get(viewHolder.getAdapterPosition()).getDescription());
                 i.putExtra("anime_studio",mData.get(viewHolder.getAdapterPosition()).getStudio());

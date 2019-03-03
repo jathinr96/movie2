@@ -10,7 +10,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.demotxt.myapp.myapplication.R ;
 
-public class AnimeActivity extends AppCompatActivity {
+import java.util.Objects;
+
+public class MovieActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +20,11 @@ public class AnimeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_anime);
 
         // hide the default actionbar
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         // Recieve data
 
-        String name  = getIntent().getExtras().getString("anime_name");
+        String name  = Objects.requireNonNull(getIntent().getExtras()).getString("anime_name");
         String description = getIntent().getExtras().getString("anime_description");
         String studio = getIntent().getExtras().getString("anime_studio") ;
         String category = getIntent().getExtras().getString("anime_category");

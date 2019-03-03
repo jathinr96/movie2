@@ -1,10 +1,10 @@
 package com.demotxt.myapp.myapplication.model;
 
 /**
- * Created by Aws on 11/03/2018.
+ * Created by JR on 02/02/2019.
  */
 
-public class Anime {
+public class Movie {
 
     private String name ;
     private String Description;
@@ -14,10 +14,10 @@ public class Anime {
     private String studio ;
     private String image_url;
 
-    public Anime() {
+    public Movie() {
     }
 
-    public Anime(String name, String description, String rating, int nb_episode, String categorie, String studio, String image_url) {
+    public Movie(String name, String description, String rating, int nb_episode, String categorie, String studio, String image_url) {
         this.name = name;
         Description = description;
         this.rating = rating;

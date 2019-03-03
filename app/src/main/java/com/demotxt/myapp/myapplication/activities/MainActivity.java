@@ -14,10 +14,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.demotxt.myapp.myapplication.R;
 import com.demotxt.myapp.myapplication.adapters.RecyclerViewAdapter;
-import com.demotxt.myapp.myapplication.model.Anime;
+import com.demotxt.myapp.myapplication.model.Movie;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private JsonArrayRequest request ;
     private JsonObjectRequest nrequest ;
     private RequestQueue requestQueue ;
-    private List<Anime> lstAnime ;
+    private List<Movie> lstMovie;
     private RecyclerView recyclerView ;
 
 
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lstAnime = new ArrayList<>() ;
+        lstMovie = new ArrayList<>() ;
         recyclerView = findViewById(R.id.recyclerviewid);
         njsonrequest();
 
@@ -47,52 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void jsonrequest() {
-
-        request = new JsonArrayRequest(JSON_URL, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-
-                JSONObject jsonObject  = null ;
-
-                for (int i = 0 ; i < response.length(); i++ ) {
-
-
-                    try {
-                        jsonObject = response.getJSONObject(i) ;
-                        Anime anime = new Anime() ;
-                        anime.setName(jsonObject.getString("name"));
-                        anime.setDescription(jsonObject.getString("description"));
-                        anime.setRating(jsonObject.getString("Rating"));
-                        anime.setCategorie(jsonObject.getString("categorie"));
-                        anime.setNb_episode(jsonObject.getInt("episode"));
-                        anime.setStudio(jsonObject.getString("studio"));
-                        anime.setImage_url(jsonObject.getString("img"));
-                        lstAnime.add(anime);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-
-                setuprecyclerview(lstAnime);
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-
-        requestQueue = Volley.newRequestQueue(MainActivity.this);
-        requestQueue.add(request) ;
-
-
-    }
 
     private void njsonrequest(){
         nrequest = new JsonObjectRequest
@@ -103,26 +56,25 @@ public class MainActivity extends AppCompatActivity {
 
                         try {
                             JSONArray jsonArray = new JSONArray();
-                            JSONObject jsonObject = null ;
+                            JSONObject jsonObject;
                             jsonArray = response.getJSONArray("Search");
                             for (int i = 0; i < jsonArray.length(); i++) {
 
 
                                 jsonObject = jsonArray.getJSONObject(i) ;
-                                Anime movie = new Anime() ;
+                                Movie movie = new Movie() ;
                                 movie.setName(jsonObject.getString("Title"));
                                 movie.setCategorie(jsonObject.getString("Type"));
                                 movie.setRating(jsonObject.getString("Year"));
                                 movie.setStudio(jsonObject.getString("imdbID"));
                                 movie.setImage_url(jsonObject.getString("Poster"));
+                                movie.setDescription(reqDescription(jsonObject.getString("imdbID")));
                                 Log.e("",jsonObject.getString("Title"));
-                                lstAnime.add(movie);
+                                lstMovie.add(movie);
                             }
                         }catch (Exception e){}
-
-
-
-                        setuprecyclerview(lstAnime);
+                        requestDecription();
+                        setuprecyclerview(lstMovie);
 
                     }
                 }, new Response.ErrorListener() {
@@ -140,10 +92,70 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setuprecyclerview(List<Anime> lstAnime) {
+    private void requestDecription(){
+        String URL1 = "http://www.omdbapi.com/?i=";
+        String URL2 = "&plot=full&apikey=9f4f767e";
+        String id,url ;
+        JsonObjectRequest request;
+
+        for (int i = 0; i< lstMovie.size(); i++){
+            final int num = i;
+
+            id = lstMovie.get(i).getStudio();
+            url =URL1 + id + URL2;
+            nrequest = new JsonObjectRequest
+                    (url, null, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+
+                            try {
+                                lstMovie.get(num).setDescription(response.getString("Plot"));
+                            }catch (Exception ignored){}
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    });
+
+        }
 
 
-        RecyclerViewAdapter myadapter = new RecyclerViewAdapter(this,lstAnime) ;
+    }
+
+    private String reqDescription(String id){
+        String URL1 = "http://www.omdbapi.com/?i=";
+        String URL2 = "&plot=full&apikey=9f4f767e";
+        String url = URL1 + id + URL2;
+//        String Description;
+
+        nrequest = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    final String Description = response.getString("Plot") ;
+                }catch (Exception e){}
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        return null;
+    }
+
+    private void setuprecyclerview(List<Movie> lstMovie) {
+
+
+        RecyclerViewAdapter myadapter = new RecyclerViewAdapter(this, lstMovie) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myadapter);
 
