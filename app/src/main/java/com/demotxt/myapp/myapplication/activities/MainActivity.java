@@ -4,11 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.demotxt.myapp.myapplication.R;
 import com.demotxt.myapp.myapplication.adapters.RecyclerViewAdapter;
@@ -24,7 +26,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private final String JSON_URL = "https://gist.githubusercontent.com/aws1994/f583d54e5af8e56173492d3f60dd5ebf/raw/c7796ba51d5a0d37fc756cf0fd14e54434c547bc/anime.json" ;
+    private final String JSON_URL2 = "http://omdbapi.com/?s=can&y=2018&type=movie&apikey=9f4f767e";
     private JsonArrayRequest request ;
+    private JsonObjectRequest nrequest ;
     private RequestQueue requestQueue ;
     private List<Anime> lstAnime ;
     private RecyclerView recyclerView ;
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         lstAnime = new ArrayList<>() ;
         recyclerView = findViewById(R.id.recyclerviewid);
-        jsonrequest();
+        njsonrequest();
 
 
 
@@ -86,6 +90,52 @@ public class MainActivity extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(MainActivity.this);
         requestQueue.add(request) ;
+
+
+    }
+
+    private void njsonrequest(){
+        nrequest = new JsonObjectRequest
+                (JSON_URL2, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            JSONArray jsonArray = new JSONArray();
+                            JSONObject jsonObject = null ;
+                            jsonArray = response.getJSONArray("Search");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+
+
+                                jsonObject = jsonArray.getJSONObject(i) ;
+                                Anime movie = new Anime() ;
+                                movie.setName(jsonObject.getString("Title"));
+                                movie.setCategorie(jsonObject.getString("Type"));
+                                movie.setRating(jsonObject.getString("Year"));
+                                movie.setStudio(jsonObject.getString("imdbID"));
+                                movie.setImage_url(jsonObject.getString("Poster"));
+                                Log.e("",jsonObject.getString("Title"));
+                                lstAnime.add(movie);
+                            }
+                        }catch (Exception e){}
+
+
+
+                        setuprecyclerview(lstAnime);
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+
+                    }
+                });
+
+        requestQueue = Volley.newRequestQueue(MainActivity.this);
+        requestQueue.add(nrequest);
 
 
     }
