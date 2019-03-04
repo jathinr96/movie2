@@ -38,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
         lstMovie = new ArrayList<>() ;
         recyclerView = findViewById(R.id.recyclerviewid);
         jsonrequest();
-
-
+        Log.e("test",String.valueOf(lstMovie.size()));
 
     }
 
