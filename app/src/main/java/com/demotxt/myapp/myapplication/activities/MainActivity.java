@@ -9,7 +9,6 @@ import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.demotxt.myapp.myapplication.R;
@@ -24,10 +23,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String JSON_URL = "https://gist.githubusercontent.com/aws1994/f583d54e5af8e56173492d3f60dd5ebf/raw/c7796ba51d5a0d37fc756cf0fd14e54434c547bc/anime.json" ;
-    private final String JSON_URL2 = "http://omdbapi.com/?s=can&y=2018&type=movie&apikey=9f4f767e";
-    private JsonArrayRequest request ;
-    private JsonObjectRequest nrequest ;
+    private final String JSON_URL = "http://omdbapi.com/?s=can&y=2018&type=movie&apikey=9f4f767e";
+    private JsonObjectRequest request ;
     private RequestQueue requestQueue ;
     private List<Movie> lstMovie;
     private RecyclerView recyclerView ;
@@ -40,16 +37,16 @@ public class MainActivity extends AppCompatActivity {
 
         lstMovie = new ArrayList<>() ;
         recyclerView = findViewById(R.id.recyclerviewid);
-        njsonrequest();
+        jsonrequest();
 
 
 
     }
 
 
-    private void njsonrequest(){
-        nrequest = new JsonObjectRequest
-                (JSON_URL2, null, new Response.Listener<JSONObject>() {
+    private void jsonrequest(){
+        request = new JsonObjectRequest
+                (JSON_URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -68,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
                                 movie.setRating(jsonObject.getString("Year"));
                                 movie.setStudio(jsonObject.getString("imdbID"));
                                 movie.setImage_url(jsonObject.getString("Poster"));
-                                movie.setDescription(reqDescription(jsonObject.getString("imdbID")));
+                                reqDescription(jsonObject.getString("imdbID"),i);
                                 Log.e("",jsonObject.getString("Title"));
                                 lstMovie.add(movie);
                             }
-                        }catch (Exception e){}
+                        }catch (Exception ignored){}
                         requestDecription();
                         setuprecyclerview(lstMovie);
 
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         requestQueue = Volley.newRequestQueue(MainActivity.this);
-        requestQueue.add(nrequest);
+        requestQueue.add(request);
 
 
     }
@@ -96,21 +93,22 @@ public class MainActivity extends AppCompatActivity {
         String URL1 = "http://www.omdbapi.com/?i=";
         String URL2 = "&plot=full&apikey=9f4f767e";
         String id,url ;
-        JsonObjectRequest request;
 
         for (int i = 0; i< lstMovie.size(); i++){
             final int num = i;
 
             id = lstMovie.get(i).getStudio();
             url =URL1 + id + URL2;
-            nrequest = new JsonObjectRequest
+            request = new JsonObjectRequest
                     (url, null, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {
 
                             try {
-                                lstMovie.get(num).setDescription(response.getString("Plot"));
+                                Movie movie = new Movie();
+                                movie.setDescription(response.getString("Plot"));
+                                lstMovie.add(movie);
                             }catch (Exception ignored){}
 
                         }
@@ -127,19 +125,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private String reqDescription(String id){
+    private void reqDescription(String id,final int i){
         String URL1 = "http://www.omdbapi.com/?i=";
         String URL2 = "&plot=full&apikey=9f4f767e";
         String url = URL1 + id + URL2;
 //        String Description;
 
-        nrequest = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        request = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    final String Description = response.getString("Plot") ;
-                }catch (Exception e){}
+                    Movie movie = new Movie();
+                    movie.setDescription(response.getString("Plot"));
+                    lstMovie.add(i,movie);
+                }catch (Exception ignored){}
 
             }
         }, new Response.ErrorListener() {
@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        return null;
     }
 
     private void setuprecyclerview(List<Movie> lstMovie) {

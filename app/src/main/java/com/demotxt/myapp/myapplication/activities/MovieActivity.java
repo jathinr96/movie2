@@ -1,5 +1,6 @@
 package com.demotxt.myapp.myapplication.activities;
 
+import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,12 +21,17 @@ public class MovieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_anime);
 
         // hide the default actionbar
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Objects.requireNonNull(getSupportActionBar()).hide();
+        }
 
         // Recieve data
 
-        String name  = Objects.requireNonNull(getIntent().getExtras()).getString("anime_name");
-        String description = getIntent().getExtras().getString("anime_description");
+        String name  = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            name = Objects.requireNonNull(getIntent().getExtras()).getString("anime_name");
+        }
+        String description = Objects.requireNonNull(getIntent().getExtras()).getString("anime_description");
         String studio = getIntent().getExtras().getString("anime_studio") ;
         String category = getIntent().getExtras().getString("anime_category");
         int nb_episode = getIntent().getExtras().getInt("anime_nb_episode") ;
