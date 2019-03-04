@@ -31,7 +31,10 @@ public class MovieActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             name = Objects.requireNonNull(getIntent().getExtras()).getString("anime_name");
         }
-        String description = Objects.requireNonNull(getIntent().getExtras()).getString("anime_description");
+        String description = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            description = Objects.requireNonNull(getIntent().getExtras()).getString("anime_description");
+        }
         String studio = getIntent().getExtras().getString("anime_studio") ;
         String category = getIntent().getExtras().getString("anime_category");
         int nb_episode = getIntent().getExtras().getInt("anime_nb_episode") ;
